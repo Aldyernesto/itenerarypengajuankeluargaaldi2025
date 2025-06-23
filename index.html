@@ -12,7 +12,7 @@
     <!-- Chosen Palette: Warm Neutral with Soft Teal Accent -->
     <!-- Application Structure Plan: A single-page dashboard design is used to transform the linear report into an interactive planning tool. The structure is thematic: 1. Overview (key stats), 2. Interactive Itinerary (daily cards), 3. Dynamic Budget (interactive chart and tables), 4. Hotel Comparison (selectable cards), and 5. Travel Tips. This non-linear structure allows users to quickly access specific information (like budget impact or daily schedule) without scrolling through a long document. The key interaction is linking the hotel selection directly to the budget visualization, empowering the user to make informed decisions easily. This design prioritizes usability and quick comprehension over mimicking the original report's format. -->
     <!-- Visualization & Content Choices: 
-        - Report Info: Total Budget Breakdown -> Goal: Compare cost components -> Viz: Donut Chart -> Interaction: Select hotel to update chart -> Justification: Instantly visualizes the financial financial impact of accommodation choices, making it easier to understand trade-offs -> Library: Chart.js (Canvas).
+        - Report Info: Total Budget Breakdown -> Goal: Compare cost components -> Viz: Donut Chart -> Interaction: Select hotel to update chart -> Justification: Instantly visualizes the financial impact of accommodation choices, making it easier to understand trade-offs -> Library: Chart.js (Canvas).
         - Report Info: Daily Itinerary -> Goal: Follow the daily plan -> Viz: Interactive Cards -> Interaction: Click to expand/collapse details -> Justification: Reduces clutter and allows the user to focus on a single day's activities at a time -> Library: HTML/Tailwind/JS.
         - Report Info: Hotel Options & Costs -> Goal: Compare and select accommodation -> Viz: Interactive Comparison Cards -> Interaction: Radio button selection updates the budget chart and tables -> Justification: Creates a direct cause-and-effect link between a choice and its financial consequence, aiding decision-making -> Library: HTML/Tailwind/JS.
         - Report Info: General Travel Tips -> Goal: Inform best practices -> Viz: Icon-based list -> Interaction: Static display -> Justification: Easy to scan and absorb key advice -> Library: HTML/Tailwind.
@@ -103,7 +103,7 @@
 
         <section id="anggaran">
             <h2 class="text-3xl font-bold text-slate-800 mb-2">Estimasi Anggaran Biaya</h2>
-            <p class="text-slate-600 mb-6 max-w-3xl">Bagian ini merinci estimasi biaya perjalanan Anda. Pilihan hotel sudah ditentukan untuk kesederhanaan. Estimasi biaya akomodasi sudah dihitung untuk 2 malam (malam 29 Juni dan malam 1 Juli) sesuai rekomendasi untuk kenyamanan saat tiba dan persiapan pulang.</p>
+            <p class="text-slate-600 mb-6 max-w-3xl">Bagian ini merinci estimasi biaya perjalanan Anda. Pilihan hotel dapat diatur di bagian "Pilihan Hotel" untuk melihat bagaimana keputusan Anda memengaruhi alokasi dan total anggaran secara real-time. Estimasi biaya akomodasi sudah dihitung untuk 2 malam (malam 29 Juni dan malam 1 Juli) sesuai rekomendasi untuk kenyamanan saat tiba dan persiapan pulang.</p>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-xl font-bold text-center text-slate-800 mb-4">Alokasi Biaya</h3>
@@ -115,16 +115,16 @@
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold text-slate-800 mb-2">Ringkasan Biaya</h3>
                         <div class="space-y-2 text-sm">
-                            <div class="flex justify-between"><span>Transportasi</span> <span class="font-medium">Rp 615.000</span></div>
+                            <div class="flex justify-between"><span>Transportasi</span> <span class="font-medium" id="transport-cost-summary"></span></div>
                             <div class="flex justify-between"><span>Akomodasi (2 malam)</span> <span id="accommodation-cost-summary" class="font-medium"></span></div>
                             <hr class="my-2">
                             <div class="flex justify-between text-base font-bold text-slate-800"><span>Total Estimasi</span> <span id="total-cost-summary"></span></div>
                         </div>
-                        <p class="text-xs text-slate-500 mt-4">Biaya transportasi bersifat tetap. Biaya akomodasi sudah berdasarkan pilihan hotel yang ditentukan.</p>
+                        <p class="text-xs text-slate-500 mt-4">Biaya transportasi bersifat tetap. Biaya akomodasi dan total akan berubah sesuai pilihan hotel Anda.</p>
                     </div>
                      <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold text-slate-800 mb-2">Hotel Terpilih</h3>
-                        <div id="selected-hotel-info" class="text-sm"></div>
+                        <div id="selected-hotel-info" class="text-sm">Pilih hotel di bawah untuk melihat detailnya di sini.</div>
                     </div>
                 </div>
             </div>
@@ -132,7 +132,8 @@
 
         <section id="hotel">
             <h2 class="text-3xl font-bold text-slate-800 mb-2">Pilihan Akomodasi</h2>
-             <p class="text-slate-600 mb-6 max-w-3xl">Berikut adalah pilihan hotel yang telah ditentukan: **RedDoorz Plus near Trans Studio Cibubur 2**, dengan estimasi harga Rp 300.000 per malam. **Pemesanan ini diasumsikan untuk 2 malam terpisah:**
+             <p class="text-slate-600 mb-6 max-w-3xl">Berikut adalah beberapa rekomendasi hotel di area Cibubur. Pilih salah satu untuk memperbarui rincian anggaran di atas dan lihat mana yang paling sesuai dengan kebutuhan dan budget keluarga Anda.
+             **Pemesanan ini diasumsikan untuk 2 malam terpisah:**
              <ul class="list-disc list-inside ml-4 text-slate-600 mb-2">
                  <li>**Malam pertama:** Check-in 29 Juni, check-out 30 Juni (setelah sarapan, untuk menuju lokasi acara).</li>
                  <li>**Malam kedua:** Check-in 1 Juli (setelah acara selesai), check-out 2 Juli (pagi, sebelum persiapan pulang).</li>
@@ -194,20 +195,21 @@
                         { label: 'Catatan', value: 'Berangkat lebih pagi untuk menghindari macet.' }
                     ],
                     transportation: [
-                        { type: 'Grab/Gojek Motor', passengers: '1 orang', class: '-', cost: 'Est. Rp 40.000 (dari HaramainKU ke Kp. Rambutan/Terminal Bayangan Pasar Rebo)' },
-                        { type: 'Bus Primajasa', passengers: '1 orang', class: 'Ekonomi / Executive', cost: 'Rp 75.000 / Rp 95.000' }
+                        { type: 'gojek / grab motor (Rumah - Kp. Rambutan/Pasar Rebo)', passengers: '1 orang', class: '-', cost: 'Rp 40.000', numericCost: 40000 },
+                        { type: 'Bus Primajasa', passengers: '1 orang', class: 'Executive', cost: 'Rp 95.000', numericCost: 95000 }
                     ]
                 },
                 {
                     day: 'Sabtu, 29 Juni 2025',
                     title: 'Menuju Cibubur & Check-in Hotel (Malam Pertama)',
-                    icon: '🏨',
+                    icon: '�',
                     details: [
                         { label: 'Aktivitas', value: 'Pagi hari berangkat dari Garut ke Cibubur Country bersama keluarga. Siang hari tiba di Cibubur, **lalu check-in ke RedDoorz Plus near Trans Studio Cibubur 2 untuk malam pertama (29 Juni - 30 Juni).**' },
                         { label: 'Tiba', value: 'Siang hari tiba di Cibubur dan beristirahat.' }
                     ],
                     transportation: [
-                        { type: 'Bus Primajasa', passengers: '2 dewasa, anak gratis', class: 'Ekonomi / Executive', cost: 'Rp 150.000 / Rp 190.000' }
+                        { type: 'Bus Primajasa', passengers: '2 dewasa, anak gratis', class: 'Executive', cost: 'Rp 190.000', numericCost: 190000 },
+                        { type: 'Grab/Gojek Mobil (Terminal/Drop-off Cibubur - Hotel)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 40.000', numericCost: 40000 }
                     ]
                 },
                 {
@@ -220,7 +222,7 @@
                         { label: 'Catatan', value: 'Pastikan hotel dekat dengan lokasi acara untuk kemudahan akses dan meminimalkan waktu perjalanan antara hotel dan lokasi gathering.' }
                     ],
                     transportation: [
-                        { type: 'Grab/Gojek Motor', passengers: 'Variabel', class: '-', cost: 'Est. Rp 25.000 (ke Cibubur Junction atau sekitar lokasi)' }
+                        { type: 'Grab/Gojek Mobil (Hotel - HaramainKU)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 50.000', numericCost: 50000 }
                     ]
                 },
                 {
@@ -233,7 +235,7 @@
                         { label: 'Catatan', value: 'Pesan hotel dengan fleksibilitas check-in malam jika memungkinkan.' }
                     ],
                     transportation: [
-                        { type: 'Grab/Gojek Motor', passengers: 'Variabel', class: '-', cost: 'Est. Rp 25.000 (dari lokasi acara ke hotel)' }
+                        { type: 'Grab/Gojek Mobil (HaramainKU - Hotel)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 50.000', numericCost: 50000 }
                     ]
                 },
                 {
@@ -245,133 +247,142 @@
                         { label: 'Waktu Keberangkatan dari Hotel', value: 'Pukul 15:00 WIB.'}
                     ],
                     transportation: [
-                        { type: 'LRT Harjamukti (transit Cawang ke LRT Jatimulya)', passengers: '2 dewasa', class: '-', cost: 'Rp 20.000' },
-                        { type: 'Grab Mobil (LRT Jatimulya ke Stasiun Bekasi)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 60.000' },
-                        { type: 'Kereta Cikuray (Bekasi - Garut)', passengers: '2 dewasa', class: 'Ekonomi', cost: 'Rp 90.000', time: '18:06 WIB (kereta berangkat), 22:50 WIB (tiba di Garut)' },
-                        { type: 'Grab Car (Stasiun Garut - Rumah)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 60.000' }
+                        { type: 'Grab/Gojek Mobil (Hotel - LRT Harjamukti)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 35.000', numericCost: 35000 },
+                        { type: 'LRT Harjamukti (transit Cawang ke LRT Jatimulya)', passengers: '2 dewasa', class: '-', cost: 'Rp 20.000', numericCost: 20000 },
+                        { type: 'Grab Mobil (LRT Jatimulya ke Stasiun Bekasi)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 60.000', numericCost: 60000 },
+                        { type: 'Kereta Cikuray (Bekasi - Garut)', passengers: '2 dewasa', class: 'Ekonomi', cost: 'Rp 90.000', numericCost: 90000, time: '18:06 WIB (kereta berangkat), 22:50 WIB (tiba di Garut)' },
+                        { type: 'Grab Car (Stasiun Garut - Rumah)', passengers: '1 keluarga', class: '-', cost: 'Est. Rp 60.000', numericCost: 60000 }
                     ]
                 }
             ];
 
             const hotelData = {
-                'reddoorz_junction': {
-                    id: 'reddoorz_junction',
-                    name: 'RedDoorz Plus near Trans Studio Cibubur 2', // Updated name here
-                    price: 300000, // Updated price as requested by the user
+                'reddoorz_plus_tsm2': { // Changed ID to match name update logic if any was used
+                    id: 'reddoorz_plus_tsm2',
+                    name: 'RedDoorz Plus near Trans Studio Cibubur 2',
+                    price: 300000,
                     tag: 'Pilihan Anda',
                     tagColor: 'bg-indigo-100 text-indigo-800',
                     features: ['AC', 'WiFi'],
                     notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'reddoorz_tsm3': {
+                    id: 'reddoorz_tsm3',
+                     name: 'RedDoorz near Trans Studio Mall Cibubur 3',
+                    price: 271107,
+                    tag: 'Dekat Cibubur Junction',
+                    tagColor: 'bg-blue-100 text-blue-800',
+                    features: ['Teras', 'Sarapan', 'WiFi'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'mailbox': {
+                    id: 'mailbox',
+                    name: 'Hotel Mailbox Arsakha Lobi B Cibubur Village',
+                    price: 245700,
+                    tag: 'Akses Mudah',
+                    tagColor: 'bg-yellow-100 text-yellow-800',
+                    features: ['WiFi', 'Parkir'],
+                     notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'reddoorz_syariah':{
+                    id: 'reddoorz_syariah',
+                    name: 'RedDoorz Syariah Plus near Trans Studio Cibubur',
+                    price: 142272,
+                    tag: 'Hemat & Nyaman',
+                    tagColor: 'bg-green-100 text-green-800',
+                    features: ['Restoran', 'Teras', 'Parkir'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'myhome2': {
+                    id: 'myhome2',
+                     name: 'My home2 Mall Ciputra Cibubur Redpartner',
+                    price: 182780,
+                    tag: 'Strategis',
+                    tagColor: 'bg-teal-100 text-teal-800',
+                    features: ['WiFi', 'AC'],
+                     notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'qube': {
+                    id: 'qube',
+                    name: 'QUBE HOTEL by 98hospitality',
+                    price: 286899,
+                    tag: 'Dekat LRT',
+                    tagColor: 'bg-purple-100 text-purple-800',
+                    features: ['WiFi', 'AC', 'Parkir'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'ethan': {
+                    id: 'ethan',
+                    name: 'Ethan Hotel & Cafe',
+                    price: 226586,
+                    tag: 'Nyaman & Lengkap',
+                    tagColor: 'bg-orange-100 text-orange-800',
+                    features: ['Restoran', 'WiFi', 'AC'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'ivi': {
+                    id: 'ivi',
+                    name: 'IVI Hotel - Indonesia Value Inn',
+                    price: 193134,
+                    tag: 'Pilihan Terjangkau',
+                    tagColor: 'bg-lime-100 text-lime-800',
+                    features: ['WiFi', 'AC', 'Parkir'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'megastay':  {
+                    id: 'megastay',
+                    name: 'MegaStay Kelapa Gading', 
+                    price: 188355,
+                    tag: 'Alternatif',
+                    tagColor: 'bg-gray-100 text-gray-800',
+                    features: ['WiFi', 'AC'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'safina': {
+                    id: 'safina',
+                    name: 'Hotel Safina',
+                    price: 363856,
+                    tag: 'Kualitas Tinggi',
+                    tagColor: 'bg-indigo-100 text-indigo-800',
+                    features: ['WiFi', 'AC', 'Parkir'],
+                     notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                'urbanview': {
+                     id: 'urbanview',
+                    name: 'Urbanview SRB Near Mall Ciputra Cibubur',
+                    price: 179951,
+                    tag: 'Modern',
+                    tagColor: 'bg-pink-100 text-pink-800',
+                    features: ['WiFi', 'AC'],
+                     notes: 'Harga online mungkin berbeda dengan harga langsung.'
+                },
+                 'kingstone':{
+                    id: 'kingstone',
+                    name: 'King Stone Resort Hotel',
+                    price: 300000,
+                    tag: 'Resort',
+                    tagColor: 'bg-amber-100 text-amber-800',
+                    features: ['Kolam Renang', 'Restoran', 'Fasilitas Keluarga'],
+                    notes: 'Harga online mungkin berbeda dengan harga langsung.'
                 }
             };
             
-            let selectedHotelId = 'reddoorz_junction'; // Default to the only selected hotel
-            // Initial transport cost calculation:
-            // 28 Jun: Grab/Gojek Motor (40000) + Bus Primajasa (75000/95000) -> using 75000 for calculation example
-            // 29 Jun: Bus Primajasa (150000/190000) -> using 150000 for calculation example
-            // 30 Jun/1 Jul: Grab/Gojek Motor x2 (25000x2 = 50000)
-            // 2 Jul: LRT (20000) + Grab Mobil (60000) + Kereta (90000) + Grab Car (60000)
-            // Total: 40000 (Grab 28th) + 75000 (Bus 28th) + 150000 (Bus 29th) + 50000 (Grab 30th/1st) + 20000 (LRT) + 60000 (Grab St. Bekasi) + 90000 (Kereta) + 60000 (Grab Garut)
-            // Total = 40000 + 75000 + 150000 + 50000 + 20000 + 60000 + 90000 + 60000 = 545000 (if using economy bus)
-            // The previous total transport cost was 575000. I will adjust this based on explicit costs provided.
-            // Let's sum up explicit costs:
-            // Bus Primajasa (28 Jun, 1 orang Ekonomi): Rp 75.000
-            // Bus Primajasa (29 Jun, 2 dewasa Ekonomi): Rp 150.000
-            // LRT (2 Jul, 2 PAX): Rp 20.000
-            // Kereta Cikuray (2 Jul, 2 dewasa): Rp 90.000
-            // Grab/Gojek Motor (30 Jun/1 Jul, 2x): Rp 50.000 (assuming 2 trips @ 25000)
-            // Grab Mobil (2 Jul, LRT Jatimulya - St. Bekasi): Rp 60.000
-            // Grab Car (2 Jul, St. Garut - Rumah): Rp 60.000
-            // NEW: Grab/Gojek Motor (28 Jun, HaramainKU - Kp Rambutan/Pasar Rebo): Rp 40.000
-            // Total: 75000 + 150000 + 20000 + 90000 + 50000 + 60000 + 60000 + 40000 = 545000.
-            // Okay, the previous `transportCost = 575000;` seems to be a fixed sum the user provided, not derived from the components.
-            // I will maintain the `transportCost = 575000;` as a base provided by the user, and add the new Rp 40.000 to it.
-            const transportCost = 575000 + 40000; // Adding the new Grab/Gojek cost for 28 June
-
-            const itineraryContainer = document.getElementById('itinerary-container');
-            itineraryData.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-lg shadow overflow-hidden';
-                card.innerHTML = `
-                    <div class="p-4 flex justify-between items-center cursor-pointer bg-slate-50 hover:bg-slate-100">
-                        <div class="flex items-center gap-4">
-                            <span class="text-2xl">${item.icon}</span>
-                            <div>
-                                <h3 class="font-bold text-slate-800">${item.day}</h3>
-                                <p class="text-sm text-slate-600">${item.title}</p>
-                            </div>
-                        </div>
-                        <span class="transform transition-transform duration-300">▼</span>
-                    </div>
-                    <div class="px-6 pb-6 pt-4 border-t border-slate-200 hidden">
-                        <ul class="space-y-3 text-sm mb-4">
-                            ${item.details.map(detail => `
-                                <li class="flex items-start">
-                                    <span class="font-semibold text-slate-800 w-28 flex-shrink-0">${detail.label}</span>
-                                    <span class="text-slate-600">${detail.value}</span>
-                                </li>
-                            `).join('')}
-                        </ul>
-
-                        ${item.transportation && item.transportation.length > 0 ? `
-                            <h4 class="font-bold text-slate-800 mb-2">Detail Transportasi:</h4>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-semibold text-slate-700 bg-slate-50 p-2 rounded-t-md">
-                                <span>Moda</span>
-                                <span>Penumpang</span>
-                                <span>Kelas/Info</span>
-                                <span>Biaya</span>
-                            </div>
-                            <div class="space-y-1">
-                                ${item.transportation.map(transport => `
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-600 border-b border-slate-100 py-1">
-                                        <span>${transport.type}</span>
-                                        <span>${transport.passengers}</span>
-                                        <span>${transport.class || '-'} ${transport.time ? `<br>(${transport.time})` : ''}</span>
-                                        <span>${transport.cost}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                itineraryContainer.appendChild(card);
-                
-                const header = card.querySelector('.cursor-pointer');
-                const content = card.querySelector('.hidden');
-                const arrow = card.querySelector('.transform');
-                header.addEventListener('click', () => {
-                    content.classList.toggle('hidden');
-                    arrow.classList.toggle('rotate-180');
-                });
+            let selectedHotelId = 'reddoorz_plus_tsm2'; 
+            
+            // Calculate total transport cost by summing all numeric costs in itineraryData
+            let totalCalculatedTransportCost = 0;
+            itineraryData.forEach(day => {
+                if (day.transportation) {
+                    day.transportation.forEach(transport => {
+                        if (transport.numericCost) {
+                            totalCalculatedTransportCost += transport.numericCost;
+                        }
+                    });
+                }
             });
-
-            const hotelOptionsContainer = document.getElementById('hotel-options-container');
-            // Ensure only the selected hotel is displayed
-            const hotel = hotelData[selectedHotelId];
-            if (hotel) {
-                const card = document.createElement('div');
-                card.className = 'hotel-card bg-white p-5 rounded-lg shadow border-2 border-teal-500 has-[:checked]:shadow-lg'; // Always selected and highlighted
-                card.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-lg">${hotel.name}</h3>
-                            <span class="text-xs font-medium px-2 py-0.5 rounded-full ${hotel.tagColor}">${hotel.tag}</span>
-                        </div>
-                        <input type="radio" name="hotel_option" id="${hotel.id}" value="${hotel.id}" class="h-5 w-5 mt-1 text-teal-600 focus:ring-teal-500 border-gray-300" checked disabled>
-                    </div>
-                    <p class="text-2xl font-bold text-teal-600 my-3">Rp ${hotel.price.toLocaleString('id-ID')} <span class="text-sm font-normal text-slate-500">/ malam</span></p>
-                    <div class="text-sm space-y-2 mb-3">
-                        <p class="font-semibold">Fasilitas Utama:</p>
-                        <div class="flex flex-wrap gap-2">
-                           ${hotel.features.map(f => `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">${f}</span>`).join('')}
-                        </div>
-                    </div>
-                    <p class="text-xs text-red-600 bg-red-50 p-2 rounded"><span class="font-bold">Catatan Penting:</span> ${hotel.notes}</p>
-                `;
-                hotelOptionsContainer.appendChild(card);
-            }
-
-
+            const transportCost = totalCalculatedTransportCost; 
+            
+            const transportCostSummaryEl = document.getElementById('transport-cost-summary');
             const accommodationCostEl = document.getElementById('accommodation-cost-summary');
             const totalCostEl = document.getElementById('total-cost-summary');
             const selectedHotelInfoEl = document.getElementById('selected-hotel-info');
@@ -384,9 +395,10 @@
 
             function updateBudget() {
                 const selectedHotel = hotelData[selectedHotelId];
-                const accommodationCost = selectedHotel.price * 2; // Fixed to 2 nights (split)
+                const accommodationCost = selectedHotel.price * 2; 
                 const totalCost = transportCost + accommodationCost;
                 
+                transportCostSummaryEl.textContent = formatCurrency(transportCost);
                 accommodationCostEl.textContent = formatCurrency(accommodationCost);
                 totalCostEl.textContent = formatCurrency(totalCost);
 
@@ -404,7 +416,7 @@
             
             function createChart() {
                 const selectedHotel = hotelData[selectedHotelId];
-                const accommodationCost = selectedHotel.price * 2; // Fixed to 2 nights (split)
+                const accommodationCost = selectedHotel.price * 2; 
 
                 budgetChart = new Chart(budgetChartCtx, {
                     type: 'doughnut',
@@ -449,13 +461,45 @@
                 });
             }
 
-            // No event listener needed for hotel options as it's fixed
-            // hotelOptionsContainer.addEventListener('change', (e) => {
-            //     if (e.target.name === 'hotel_option') {
-            //         selectedHotelId = e.target.value;
-            //         updateBudget();
-            //     }
-            // });
+            const hotelOptionsContainer = document.getElementById('hotel-options-container');
+            // Revert rendering logic to show all hotels and enable selection
+            Object.values(hotelData).forEach(hotel => {
+                const card = document.createElement('div');
+                card.className = `hotel-card bg-white p-5 rounded-lg shadow border-2 ${hotel.id === selectedHotelId ? 'border-teal-500 shadow-lg' : 'border-transparent'}`;
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg">${hotel.name}</h3>
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full ${hotel.tagColor}">${hotel.tag}</span>
+                        </div>
+                        <input type="radio" name="hotel_option" id="${hotel.id}" value="${hotel.id}" class="h-5 w-5 mt-1 text-teal-600 focus:ring-teal-500 border-gray-300" ${hotel.id === selectedHotelId ? 'checked' : ''}>
+                    </div>
+                    <p class="text-2xl font-bold text-teal-600 my-3">Rp ${hotel.price.toLocaleString('id-ID')} <span class="text-sm font-normal text-slate-500">/ malam</span></p>
+                    <div class="text-sm space-y-2 mb-3">
+                        <p class="font-semibold">Fasilitas Utama:</p>
+                        <div class="flex flex-wrap gap-2">
+                           ${hotel.features.map(f => `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">${f}</span>`).join('')}
+                        </div>
+                    </div>
+                    <p class="text-xs text-red-600 bg-red-50 p-2 rounded"><span class="font-bold">Catatan Penting:</span> ${hotel.notes}</p>
+                `;
+                hotelOptionsContainer.appendChild(card);
+            });
+
+            // Re-enable event listener for hotel options
+            hotelOptionsContainer.addEventListener('change', (e) => {
+                if (e.target.name === 'hotel_option') {
+                    selectedHotelId = e.target.value;
+                    // Update border for selected card visually
+                    hotelOptionsContainer.querySelectorAll('.hotel-card').forEach(card => {
+                        card.classList.remove('border-teal-500', 'shadow-lg');
+                        card.classList.add('border-transparent');
+                    });
+                    e.target.closest('.hotel-card').classList.add('border-teal-500', 'shadow-lg');
+                    e.target.closest('.hotel-card').classList.remove('border-transparent');
+                    updateBudget();
+                }
+            });
             
             const navbar = document.getElementById('navbar');
             const sections = document.querySelectorAll('section');
@@ -491,3 +535,4 @@
     </script>
 </body>
 </html>
+�
