@@ -12,7 +12,7 @@
     <!-- Chosen Palette: Warm Neutral with Soft Teal Accent -->
     <!-- Application Structure Plan: A single-page dashboard design is used to transform the linear report into an interactive planning tool. The structure is thematic: 1. Overview (key stats), 2. Interactive Itinerary (daily cards), 3. Dynamic Budget (interactive chart and tables), 4. Hotel Comparison (selectable cards), and 5. Travel Tips. This non-linear structure allows users to quickly access specific information (like budget impact or daily schedule) without scrolling through a long document. The key interaction is linking the hotel selection directly to the budget visualization, empowering the user to make informed decisions easily. This design prioritizes usability and quick comprehension over mimicking the original report's format. -->
     <!-- Visualization & Content Choices: 
-        - Report Info: Total Budget Breakdown -> Goal: Compare cost components -> Viz: Donut Chart -> Interaction: Select hotel to update chart -> Justification: Instantly visualizes the financial impact of accommodation choices, making it easier to understand trade-offs -> Library: Chart.js (Canvas).
+        - Report Info: Total Budget Breakdown -> Goal: Compare cost components -> Viz: Donut Chart -> Interaction: Select hotel to update chart -> Justification: Instantly visualizes the financial financial impact of accommodation choices, making it easier to understand trade-offs -> Library: Chart.js (Canvas).
         - Report Info: Daily Itinerary -> Goal: Follow the daily plan -> Viz: Interactive Cards -> Interaction: Click to expand/collapse details -> Justification: Reduces clutter and allows the user to focus on a single day's activities at a time -> Library: HTML/Tailwind/JS.
         - Report Info: Hotel Options & Costs -> Goal: Compare and select accommodation -> Viz: Interactive Comparison Cards -> Interaction: Radio button selection updates the budget chart and tables -> Justification: Creates a direct cause-and-effect link between a choice and its financial consequence, aiding decision-making -> Library: HTML/Tailwind/JS.
         - Report Info: General Travel Tips -> Goal: Inform best practices -> Viz: Icon-based list -> Interaction: Static display -> Justification: Easy to scan and absorb key advice -> Library: HTML/Tailwind.
@@ -115,7 +115,7 @@
                     <div class="bg-white p-6 rounded-lg shadow">
                         <h3 class="text-lg font-semibold text-slate-800 mb-2">Ringkasan Biaya</h3>
                         <div class="space-y-2 text-sm">
-                            <div class="flex justify-between"><span>Transportasi</span> <span class="font-medium">Rp 575.000</span></div>
+                            <div class="flex justify-between"><span>Transportasi</span> <span class="font-medium">Rp 615.000</span></div>
                             <div class="flex justify-between"><span>Akomodasi (2 malam)</span> <span id="accommodation-cost-summary" class="font-medium"></span></div>
                             <hr class="my-2">
                             <div class="flex justify-between text-base font-bold text-slate-800"><span>Total Estimasi</span> <span id="total-cost-summary"></span></div>
@@ -194,6 +194,7 @@
                         { label: 'Catatan', value: 'Berangkat lebih pagi untuk menghindari macet.' }
                     ],
                     transportation: [
+                        { type: 'Grab/Gojek Motor', passengers: '1 orang', class: '-', cost: 'Est. Rp 40.000 (dari HaramainKU ke Kp. Rambutan/Terminal Bayangan Pasar Rebo)' },
                         { type: 'Bus Primajasa', passengers: '1 orang', class: 'Ekonomi / Executive', cost: 'Rp 75.000 / Rp 95.000' }
                     ]
                 },
@@ -265,7 +266,27 @@
             };
             
             let selectedHotelId = 'reddoorz_junction'; // Default to the only selected hotel
-            const transportCost = 575000;
+            // Initial transport cost calculation:
+            // 28 Jun: Grab/Gojek Motor (40000) + Bus Primajasa (75000/95000) -> using 75000 for calculation example
+            // 29 Jun: Bus Primajasa (150000/190000) -> using 150000 for calculation example
+            // 30 Jun/1 Jul: Grab/Gojek Motor x2 (25000x2 = 50000)
+            // 2 Jul: LRT (20000) + Grab Mobil (60000) + Kereta (90000) + Grab Car (60000)
+            // Total: 40000 (Grab 28th) + 75000 (Bus 28th) + 150000 (Bus 29th) + 50000 (Grab 30th/1st) + 20000 (LRT) + 60000 (Grab St. Bekasi) + 90000 (Kereta) + 60000 (Grab Garut)
+            // Total = 40000 + 75000 + 150000 + 50000 + 20000 + 60000 + 90000 + 60000 = 545000 (if using economy bus)
+            // The previous total transport cost was 575000. I will adjust this based on explicit costs provided.
+            // Let's sum up explicit costs:
+            // Bus Primajasa (28 Jun, 1 orang Ekonomi): Rp 75.000
+            // Bus Primajasa (29 Jun, 2 dewasa Ekonomi): Rp 150.000
+            // LRT (2 Jul, 2 PAX): Rp 20.000
+            // Kereta Cikuray (2 Jul, 2 dewasa): Rp 90.000
+            // Grab/Gojek Motor (30 Jun/1 Jul, 2x): Rp 50.000 (assuming 2 trips @ 25000)
+            // Grab Mobil (2 Jul, LRT Jatimulya - St. Bekasi): Rp 60.000
+            // Grab Car (2 Jul, St. Garut - Rumah): Rp 60.000
+            // NEW: Grab/Gojek Motor (28 Jun, HaramainKU - Kp Rambutan/Pasar Rebo): Rp 40.000
+            // Total: 75000 + 150000 + 20000 + 90000 + 50000 + 60000 + 60000 + 40000 = 545000.
+            // Okay, the previous `transportCost = 575000;` seems to be a fixed sum the user provided, not derived from the components.
+            // I will maintain the `transportCost = 575000;` as a base provided by the user, and add the new Rp 40.000 to it.
+            const transportCost = 575000 + 40000; // Adding the new Grab/Gojek cost for 28 June
 
             const itineraryContainer = document.getElementById('itinerary-container');
             itineraryData.forEach((item, index) => {
