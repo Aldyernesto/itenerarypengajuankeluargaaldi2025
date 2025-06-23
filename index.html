@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rencana Perjalanan Interaktif: Garut - Cibubur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral with Soft Teal Accent -->
+    <!-- Application Structure Plan: A single-page dashboard design is used to transform the linear report into an interactive planning tool. The structure is thematic: 1. Overview (key stats), 2. Interactive Itinerary (daily cards), 3. Dynamic Budget (interactive chart and tables), 4. Hotel Comparison (selectable cards), and 5. Travel Tips. This non-linear structure allows users to quickly access specific information (like budget impact or daily schedule) without scrolling through a long document. The key interaction is linking the hotel selection directly to the budget visualization, empowering the user to make informed decisions easily. This design prioritizes usability and quick comprehension over mimicking the original report's format. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Total Budget Breakdown -> Goal: Compare cost components -> Viz: Donut Chart -> Interaction: Select hotel to update chart -> Justification: Instantly visualizes the financial impact of accommodation choices, making it easier to understand trade-offs -> Library: Chart.js (Canvas).
+        - Report Info: Daily Itinerary -> Goal: Follow the daily plan -> Viz: Interactive Cards -> Interaction: Click to expand/collapse details -> Justification: Reduces clutter and allows the user to focus on a single day's activities at a time -> Library: HTML/Tailwind/JS.
+        - Report Info: Hotel Options & Costs -> Goal: Compare and select accommodation -> Viz: Interactive Comparison Cards -> Interaction: Radio button selection updates the budget chart and tables -> Justification: Creates a direct cause-and-effect link between a choice and its financial consequence, aiding decision-making -> Library: HTML/Tailwind/JS.
+        - Report Info: General Travel Tips -> Goal: Inform best practices -> Viz: Icon-based list -> Interaction: Static display -> Justification: Easy to scan and absorb key advice -> Library: HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4; 
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            color: #0d9488;
+            border-bottom-color: #0d9488;
+        }
+        .hotel-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .hotel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 320px;
+            width: 100%;
+            max-width: 320px;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    Rencana Perjalanan Keluarga Aldi 
+                    <span class="text-xs px-2 py-1 bg-teal-100 text-teal-700 rounded-full font-medium">Pengajuan</span>
+                </h1>
+                <nav id="navbar" class="mt-4 sm:mt-0 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-medium text-slate-500">
+                    <a href="#ringkasan" class="nav-link pb-1 border-b-2 border-transparent hover:text-teal-600">Ringkasan</a>
+                    <a href="#jadwal" class="nav-link pb-1 border-b-2 border-transparent hover:text-teal-600">Jadwal</a>
+                    <a href="#anggaran" class="nav-link pb-1 border-b-2 border-transparent hover:text-teal-600">Anggaran</a>
+                    <a href="#hotel" class="nav-link pb-1 border-b-2 border-transparent hover:text-teal-600">Pilihan Hotel</a>
+                    <a href="#tips" class="nav-link pb-1 border-b-2 border-transparent hover:text-teal-600">Tips</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-12">
+
+        <section id="ringkasan">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Ringkasan Perjalanan</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">Berikut adalah gambaran umum rencana perjalanan yang diajukan untuk Keluarga Aldi, dari Garut ke Cibubur dalam rangka acara kumpul keluarga. Rencana ini sudah mempertimbangkan waktu istirahat yang lebih santai dengan perpanjangan menginap hotel. Gunakan aplikasi ini untuk melihat detail jadwal, anggaran, dan pilihan akomodasi.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-teal-600 mb-2">📅</div>
+                    <h3 class="font-bold text-slate-800">Tanggal</h3>
+                    <p class="text-sm">28 Jun - 3 Jul 2025</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-teal-600 mb-2">⏳</div>
+                    <h3 class="font-bold text-slate-800">Durasi</h3>
+                    <p class="text-sm">6 Hari / 4 Malam</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-teal-600 mb-2">👨‍👩‍👦</div>
+                    <h3 class="font-bold text-slate-800">Peserta</h3>
+                    <p class="text-sm">2 Dewasa, 1 Anak</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <div class="text-teal-600 mb-2">📍</div>
+                    <h3 class="font-bold text-slate-800">Tujuan Utama</h3>
+                    <p class="text-sm">Gathering di Cibubur</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="jadwal">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Jadwal Interaktif</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">Klik pada setiap hari untuk melihat rincian rencana perjalanan, termasuk aktivitas, transportasi, dan catatan penting.</p>
+            <div id="itinerary-container" class="space-y-4"></div>
+        </section>
+
+        <section id="anggaran">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Estimasi Anggaran Biaya</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">Bagian ini merinci estimasi biaya perjalanan Anda. Pilih opsi hotel pada bagian "Pilihan Hotel" di bawah untuk melihat bagaimana keputusan Anda memengaruhi alokasi dan total anggaran secara real-time. Estimasi biaya akomodasi sudah dihitung untuk 4 malam (29 Juni - 3 Juli 2025).</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-bold text-center text-slate-800 mb-4">Alokasi Biaya</h3>
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Ringkasan Biaya</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between"><span>Transportasi</span> <span class="font-medium">Rp 575.000</span></div>
+                            <div class="flex justify-between"><span>Akomodasi (4 malam)</span> <span id="accommodation-cost-summary" class="font-medium"></span></div>
+                            <hr class="my-2">
+                            <div class="flex justify-between text-base font-bold text-slate-800"><span>Total Estimasi</span> <span id="total-cost-summary"></span></div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-4">Biaya transportasi bersifat tetap. Biaya akomodasi dan total akan berubah sesuai pilihan hotel Anda.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Hotel Terpilih</h3>
+                        <div id="selected-hotel-info" class="text-sm">Pilih hotel di bawah untuk melihat detailnya di sini.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hotel">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Pilihan Akomodasi</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">Berikut adalah beberapa rekomendasi hotel di area Cibubur. **Disarankan untuk memesan penginapan dari 29 Juni hingga 3 Juli 2025 (total 4 malam)** untuk memberikan waktu istirahat dan berkemas yang lebih santai sebelum keberangkatan kereta. Pilih salah satu hotel di bawah untuk memperbarui rincian anggaran di atas dan lihat mana yang paling sesuai dengan kebutuhan dan budget keluarga Anda.</p>
+            <div id="hotel-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+        
+        <section id="tips">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Tips Perjalanan dengan Anak</h2>
+            <p class="text-slate-600 mb-6 max-w-3xl">Agar perjalanan bersama si kecil lebih nyaman dan menyenangkan, berikut beberapa tips yang bisa Anda persiapkan.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">🎒 Perlengkapan Esensial</h3>
+                    <p class="text-sm text-slate-600">Bawa popok, tisu basah, makanan, susu, dan obat-obatan dasar yang cukup untuk seluruh durasi perjalanan.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">🧸 Hiburan di Jalan</h3>
+                    <p class="text-sm text-slate-600">Siapkan mainan favorit, buku, atau tablet untuk menjaga mood anak selama perjalanan panjang di bus atau kereta.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">⏰ Jaga Ritme</h3>
+                    <p class="text-sm text-slate-600">Usahakan jadwal tidur dan makan anak tetap teratur untuk mengurangi rewel dan kelelahan.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">👶 Mobilitas Praktis</h3>
+                    <p class="text-sm text-slate-600">Gendongan bayi atau stroller yang ringkas akan sangat membantu saat berpindah tempat di lokasi yang ramai.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">💧 Hidrasi & Camilan</h3>
+                    <p class="text-sm text-slate-600">Selalu siapkan air minum dan camilan sehat untuk menjaga energi seluruh anggota keluarga.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="font-semibold text-slate-800 mb-2 flex items-center gap-2">🎟️ Pesan Lebih Awal</h3>
+                    <p class="text-sm text-slate-600">Amankan tiket transportasi (terutama kereta) dan akomodasi dari jauh-jauh hari untuk harga terbaik dan jaminan ketersediaan.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-white mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>Aplikasi Rencana Perjalanan Interaktif &copy; 2025. Dibuat untuk memudahkan perencanaan Anda.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const itineraryData = [
+                {
+                    day: 'Jumat, 28 Juni 2025',
+                    title: 'Perjalanan ke Garut & Penjemputan',
+                    icon: '🚌',
+                    details: [
+                        { label: 'Aktivitas', value: 'Berangkat dari rumah menuju Garut untuk menjemput anak & istri.' },
+                        { label: 'Transportasi', value: 'Bus Primajasa (1 orang)' },
+                        { label: 'Biaya', value: 'Rp 75.000 (Ekonomi) / Rp 95.000 (Executive)' },
+                        { label: 'Catatan', value: 'Berangkat lebih pagi untuk menghindari macet.' }
+                    ]
+                },
+                {
+                    day: 'Sabtu, 29 Juni 2025',
+                    title: 'Menuju Cibubur & Check-in Hotel',
+                    icon: '🏨',
+                    details: [
+                        { label: 'Aktivitas', value: 'Pagi hari berangkat dari Garut ke Cibubur Country bersama keluarga.' },
+                        { label: 'Transportasi', value: 'Bus (2 dewasa, anak gratis)' },
+                        { label: 'Biaya', value: 'Rp 150.000 (Ekonomi) / Rp 190.000 (Executive)' },
+                        { label: 'Tiba', value: 'Siang hari tiba di Cibubur, check-in hotel dan istirahat.' }
+                    ]
+                },
+                {
+                    day: 'Minggu, 30 Jun - Senin, 1 Jul 2025',
+                    title: 'Kegiatan Gathering Keluarga',
+                    icon: '👨‍👩‍👧‍👦',
+                    details: [
+                        { label: 'Aktivitas', value: 'Mengikuti seluruh rangkaian acara acara keluarga di HaramainKU.' },
+                        { label: 'Lokasi', value: 'HaramainKU, Cibubur Country.' },
+                        { label: 'Transportasi Lokal', value: 'Grab/Gojek (sekitar Rp 25.000 ke Cibubur Junction).' },
+                        { label: 'Catatan', value: 'Pastikan hotel dekat dengan lokasi acara untuk kemudahan akses.' }
+                    ]
+                },
+                {
+                    day: 'Selasa, 2 Juli 2025',
+                    title: 'Waktu Bersantai & Persiapan Keberangkatan',
+                    icon: '🛋️',
+                    details: [
+                        { label: 'Pagi hingga Sore', value: 'Hari ini dapat digunakan sepenuhnya untuk istirahat, bersantai di hotel, dan berkemas dengan tenang tanpa perlu terburu-buru check-out. Manfaatkan fasilitas hotel yang tersedia.' },
+                        { label: '15:00 WIB', value: 'Berangkat menuju Stasiun Bekasi via LRT Harjamukti, transit Cawang ke LRT Jatimulya, lalu Grab Mobil ke stasiun.' },
+                        { label: 'Biaya (LRT + Grab)', value: 'LRT: Rp 20.000, Grab: Est. Rp 60.000 - Rp 80.000' },
+                        { label: '17:45 WIB', value: 'Naik Kereta Cikuray dari Stasiun Bekasi menuju Garut. Jadwal resmi berangkat 18:06 WIB, tiba 22:50 WIB.' },
+                        { label: 'Biaya Kereta', value: 'Rp 90.000 (2 dewasa @ Rp 45.000)' },
+                        { label: 'Malam', value: 'Tiba di Stasiun Garut, melanjutkan perjalanan ke rumah dengan Grab Car (Est. Rp 60.000).' },
+                    ]
+                },
+                {
+                    day: 'Rabu, 3 Juli 2025',
+                    title: 'Check-out Hotel & Fleksibilitas',
+                    icon: '🚪',
+                    details: [
+                        { label: 'Aktivitas', value: 'Pagi hari check-out dari hotel (sesuai waktu check-out standar atau fleksibel jika hotel memungkinkan). Hari ini memberikan fleksibilitas ekstra setelah perjalanan panjang.' },
+                        { label: 'Catatan', value: 'Dapat digunakan untuk istirahat lebih lanjut, sarapan santai, atau aktivitas ringan sebelum melanjutkan perjalanan pulang jika diperlukan.' }
+                    ]
+                }
+            ];
+
+            const hotelData = {
+                'hotel-o': {
+                    id: 'hotel-o',
+                    name: 'Hotel O Cibubur',
+                    price: 89143,
+                    tag: 'Paling Ekonomis',
+                    tagColor: 'bg-green-100 text-green-800',
+                    features: ['Dekat Junction', 'WiFi', 'AC'],
+                    notes: 'Membutuhkan surat nikah saat check-in.'
+                },
+                'reddoorz': {
+                    id: 'reddoorz',
+                    name: 'RedDoorz near GOR POPKI',
+                    price: 185000,
+                    tag: 'Pilihan Hemat',
+                    tagColor: 'bg-blue-100 text-blue-800',
+                    features: ['AC', 'WiFi'],
+                    notes: 'Membutuhkan surat nikah. Perhatikan ulasan kebersihan.'
+                },
+                'titanium': {
+                    id: 'titanium',
+                    name: 'Titanium Express HomTel',
+                    price: 372000,
+                    tag: 'Rekomendasi Keluarga',
+                    tagColor: 'bg-teal-100 text-teal-800',
+                    features: ['Kolam Renang', 'Kamar Keluarga', 'Ramah Anak'],
+                    notes: 'Sangat ramah keluarga. Check-out fleksibel hingga 13:00 WIB.'
+                },
+                 'namora': {
+                    id: 'namora',
+                    name: 'Namora Residence Jakarta',
+                    price: 232500,
+                    tag: 'Opsi Lain',
+                    tagColor: 'bg-yellow-100 text-yellow-800',
+                    features: ['Parkir Gratis', 'WiFi', 'Resepsionis 24 jam'],
+                    notes: 'Kebijakan anak tidak jelas, perlu konfirmasi langsung ke hotel.'
+                }
+            };
+            
+            let selectedHotelId = 'titanium'; 
+            const transportCost = 575000;
+
+            const itineraryContainer = document.getElementById('itinerary-container');
+            itineraryData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow overflow-hidden';
+                card.innerHTML = `
+                    <div class="p-4 flex justify-between items-center cursor-pointer bg-slate-50 hover:bg-slate-100">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl">${item.icon}</span>
+                            <div>
+                                <h3 class="font-bold text-slate-800">${item.day}</h3>
+                                <p class="text-sm text-slate-600">${item.title}</p>
+                            </div>
+                        </div>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </div>
+                    <div class="px-6 pb-6 pt-4 border-t border-slate-200 hidden">
+                        <ul class="space-y-3 text-sm">
+                            ${item.details.map(detail => `
+                                <li class="flex items-start">
+                                    <span class="font-semibold text-slate-800 w-28 flex-shrink-0">${detail.label}</span>
+                                    <span class="text-slate-600">${detail.value}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                itineraryContainer.appendChild(card);
+                
+                const header = card.querySelector('.cursor-pointer');
+                const content = card.querySelector('.hidden');
+                const arrow = card.querySelector('.transform');
+                header.addEventListener('click', () => {
+                    content.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180');
+                });
+            });
+
+            const hotelOptionsContainer = document.getElementById('hotel-options-container');
+            Object.values(hotelData).forEach(hotel => {
+                const card = document.createElement('div');
+                card.className = 'hotel-card bg-white p-5 rounded-lg shadow border-2 border-transparent has-[:checked]:border-teal-500 has-[:checked]:shadow-lg';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg">${hotel.name}</h3>
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full ${hotel.tagColor}">${hotel.tag}</span>
+                        </div>
+                        <input type="radio" name="hotel_option" id="${hotel.id}" value="${hotel.id}" class="h-5 w-5 mt-1 text-teal-600 focus:ring-teal-500 border-gray-300" ${hotel.id === selectedHotelId ? 'checked' : ''}>
+                    </div>
+                    <p class="text-2xl font-bold text-teal-600 my-3">Rp ${hotel.price.toLocaleString('id-ID')} <span class="text-sm font-normal text-slate-500">/ malam</span></p>
+                    <div class="text-sm space-y-2 mb-3">
+                        <p class="font-semibold">Fasilitas Utama:</p>
+                        <div class="flex flex-wrap gap-2">
+                           ${hotel.features.map(f => `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">${f}</span>`).join('')}
+                        </div>
+                    </div>
+                    <p class="text-xs text-red-600 bg-red-50 p-2 rounded"><span class="font-bold">Catatan Penting:</span> ${hotel.notes}</p>
+                `;
+                hotelOptionsContainer.appendChild(card);
+            });
+
+            const accommodationCostEl = document.getElementById('accommodation-cost-summary');
+            const totalCostEl = document.getElementById('total-cost-summary');
+            const selectedHotelInfoEl = document.getElementById('selected-hotel-info');
+            const budgetChartCtx = document.getElementById('budgetChart').getContext('2d');
+            let budgetChart;
+            
+            function formatCurrency(value) {
+                return `Rp ${Math.round(value).toLocaleString('id-ID')}`;
+            }
+
+            function updateBudget() {
+                const selectedHotel = hotelData[selectedHotelId];
+                const accommodationCost = selectedHotel.price * 4; // Changed to 4 nights
+                const totalCost = transportCost + accommodationCost;
+                
+                accommodationCostEl.textContent = formatCurrency(accommodationCost);
+                totalCostEl.textContent = formatCurrency(totalCost);
+
+                selectedHotelInfoEl.innerHTML = `
+                    <p class="font-bold text-slate-800">${selectedHotel.name}</p>
+                    <p class="text-slate-600">${formatCurrency(selectedHotel.price)} / malam</p>
+                    <p class="text-xs text-slate-500 mt-1">${selectedHotel.notes}</p>
+                `;
+                
+                if (budgetChart) {
+                    budgetChart.data.datasets[0].data = [transportCost, accommodationCost];
+                    budgetChart.update();
+                }
+            }
+            
+            function createChart() {
+                const selectedHotel = hotelData[selectedHotelId];
+                const accommodationCost = selectedHotel.price * 4; // Changed to 4 nights
+
+                budgetChart = new Chart(budgetChartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Transportasi', 'Akomodasi'],
+                        datasets: [{
+                            data: [transportCost, accommodationCost],
+                            backgroundColor: ['#0d9488', '#99f6e4'],
+                            borderColor: ['#ffffff', '#ffffff'],
+                            borderWidth: 4,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 20,
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += formatCurrency(context.parsed);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            hotelOptionsContainer.addEventListener('change', (e) => {
+                if (e.target.name === 'hotel_option') {
+                    selectedHotelId = e.target.value;
+                    updateBudget();
+                }
+            });
+            
+            const navbar = document.getElementById('navbar');
+            const sections = document.querySelectorAll('section');
+            const navLinks = navbar.querySelectorAll('a');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+
+            createChart();
+            updateBudget();
+        });
+    </script>
+</body>
+</html>
